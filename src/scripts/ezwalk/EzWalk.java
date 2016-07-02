@@ -12,7 +12,7 @@ import org.tribot.script.interfaces.EventBlockingOverride;
 import org.tribot.script.interfaces.Painting;
 
 import scripts.gui.RSGuiFrame;
-import scripts.sigma.AntiBan;
+import scripts.util.AntiBan;
 import scripts.util.BotTask;
 import scripts.util.BotTaskWalk;
 import scripts.util.Locations;
