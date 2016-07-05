@@ -11,6 +11,7 @@ import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.EventBlockingOverride;
 import org.tribot.script.interfaces.Painting;
 
+import scripts.gui.RSGui;
 import scripts.gui.RSGuiFrame;
 import scripts.util.AntiBan;
 import scripts.util.BotTask;
@@ -61,7 +62,7 @@ public class EzWalk extends Script implements Painting,EventBlockingOverride {
 		Collections.sort(supportedLocations);
 
 		// Initiaize gui
-		gui = new EzWalkGui();
+		gui = new EzWalkGui("scripts/ezwalk/icon.png");
 
 		// Run script
 		while(true) {
@@ -71,6 +72,7 @@ public class EzWalk extends Script implements Painting,EventBlockingOverride {
 				if ( currentTask.isTaskComplete() ) {
 					currentTask = currentTask.getNextTask();
 					println( "Walking task finished!" );
+					gui.setNotification( true );
 					gui.reset();
 				}
 			} else {

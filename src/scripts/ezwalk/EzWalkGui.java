@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import scripts.gui.RSGui;
 import scripts.gui.RSGuiBox;
 import scripts.gui.RSGuiButton;
 import scripts.gui.RSGuiCheckbox;
@@ -14,31 +15,23 @@ import scripts.gui.RSGuiPanel;
 import scripts.gui.RSGuiTextLabel;
 import scripts.util.BotTask;
 import scripts.util.BotTaskWalk;
-import scripts.util.Locations;
 
-public class EzWalkGui extends RSGuiFrame {
-
-	private RSGuiPanel panel;
+public class EzWalkGui extends RSGui {
 	private RSGuiBox boxTravel;
 	private RSGuiBox boxCancel;
 
-	public EzWalkGui() {
-		super( "scripts/ezwalk/icon.png", "EzWalk Gui" );
+	private RSGuiPanel panel;
+
+	public EzWalkGui(String string) {
+		super( string );
 
 		// Create the main panel
-		this.panel = new RSGuiPanel( 300, 200 );
-		this.add(panel);
+		this.panel = this.getBotPanel();
 
 		// Create main boxes
 		CREATE_BOX_TRAVEL();
 		CREATE_BOX_CANCEL();
 		panel.add(boxTravel);
-
-		// Pack frame to panel size
-		this.pack();
-		this.center();
-		this.setNotification( true );
-		this.open();
 	}
 
 	private void CREATE_BOX_CANCEL() {
@@ -74,8 +67,8 @@ public class EzWalkGui extends RSGuiFrame {
 		this.panel.remove( boxTravel );
 
 		// Create dropdown box
-		boxTravel.add( new RSGuiTextLabel(0,0,-1,-1,"Destination:") );
-		final RSGuiDropDown d = new RSGuiDropDown( 0, 16, 200 );
+		boxTravel.add( new RSGuiTextLabel(0,0,"Destination:") );
+		final RSGuiDropDown d = new RSGuiDropDown( 0, 16, boxTravel.getWidth() );
 		ArrayList<String> locs = EzWalk.supportedLocations;
 		for (int i = 0; i < locs.size(); i++) {
 			String str = locs.get(i).replace("_", " ").toLowerCase();
@@ -98,19 +91,14 @@ public class EzWalkGui extends RSGuiFrame {
 
 			@Override
 			public boolean onMousePress(int x, int y) {
-				panel.remove( boxTravel);
-				close();
+				panel.remove(boxTravel);
 				panel.add(boxCancel);
+				close();
 
 				EzWalk.plugin.walkTo( d.getCurrentChoice(), check.isChecked() );
 				return true;
 			}
 		});
-	}
-
-	@Override
-	protected void paint(Graphics g) {
-		//
 	}
 
 	public void reset() {
@@ -122,8 +110,6 @@ public class EzWalkGui extends RSGuiFrame {
 			EzWalk.plugin.println("Cancelling walking task...");
 			((BotTaskWalk)t).setForceCompleted(true);
 		}
-
-		this.setNotification(true);
 	}
 
 	private String toTitleCase(String givenString) {
