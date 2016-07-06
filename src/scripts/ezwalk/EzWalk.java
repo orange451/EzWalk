@@ -47,6 +47,7 @@ public class EzWalk extends Script implements Painting,EventBlockingOverride {
 		supportedLocations.add( Locations.VARROK_MINE_EAST.toString() );
 		supportedLocations.add( Locations.VARROK_MINE_WEST.toString() );
 		supportedLocations.add( Locations.VARROK_WILDERNESS.toString() );
+		supportedLocations.add( Locations.VARROK_SEWER.toString() );
 		supportedLocations.add( Locations.LUMBRIDGE.toString() );
 		supportedLocations.add( Locations.LUMBRIDGE_BANK.toString() );
 		supportedLocations.add( Locations.DRAYNOR_MANOR_START.toString() );

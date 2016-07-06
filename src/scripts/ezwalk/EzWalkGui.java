@@ -25,6 +25,8 @@ public class EzWalkGui extends RSGui {
 	public EzWalkGui(String string) {
 		super( string );
 
+		this.setNotification( true );
+
 		// Create the main panel
 		this.panel = this.getBotPanel();
 
