@@ -5,19 +5,17 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.tribot.api2007.Player;
 import org.tribot.api2007.WebWalking;
 import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.EventBlockingOverride;
 import org.tribot.script.interfaces.Painting;
 
-import scripts.gui.RSGui;
-import scripts.gui.RSGuiFrame;
 import scripts.util.AntiBan;
 import scripts.util.BotTask;
-import scripts.util.BotTaskWalk;
-import scripts.util.Locations;
-import scripts.util.Navigation;
+import scripts.util.names.Locations;
+import scripts.util.player.Navigation;
 
 @ScriptManifest(authors = { "orange451" }, category = "Navigation", name = "EzWalk", version = 1.00, description = "Walk to almost any F2P location in Runescape!", gameMode = 1)
 public class EzWalk extends Script implements Painting,EventBlockingOverride {
@@ -32,34 +30,34 @@ public class EzWalk extends Script implements Painting,EventBlockingOverride {
 		plugin = this;
 
 		// Update supported locations
-		supportedLocations.add( Locations.BARBARIAN_VILLAGE.toString() );
-		supportedLocations.add( Locations.EDGEVILLE.toString() );
-		supportedLocations.add( Locations.FALADOR.toString() );
-		supportedLocations.add( Locations.FALADOR_SQUARE.toString() );
-		supportedLocations.add( Locations.FALADOR_BANK_EAST.toString() );
-		supportedLocations.add( Locations.FALADOR_BANK_WEST.toString() );
-		supportedLocations.add( Locations.FALADOR_CASTLE.toString() );
-		supportedLocations.add( Locations.GRAND_EXCHANGE.toString() );
-		supportedLocations.add( Locations.VARROK.toString() );
-		supportedLocations.add( Locations.VARROK_SQUARE.toString() );
-		supportedLocations.add( Locations.VARROK_BANK_EAST.toString() );
-		supportedLocations.add( Locations.VARROK_BANK_WEST.toString() );
-		supportedLocations.add( Locations.VARROK_MINE_EAST.toString() );
-		supportedLocations.add( Locations.VARROK_MINE_WEST.toString() );
-		supportedLocations.add( Locations.VARROK_WILDERNESS.toString() );
-		supportedLocations.add( Locations.VARROK_SEWER.toString() );
-		supportedLocations.add( Locations.LUMBRIDGE.toString() );
-		supportedLocations.add( Locations.LUMBRIDGE_BANK.toString() );
-		supportedLocations.add( Locations.DRAYNOR_MANOR_START.toString() );
-		supportedLocations.add( Locations.DRAYNOR.toString() );
-		supportedLocations.add( Locations.DRAYNOR_BANK.toString() );
-		supportedLocations.add( Locations.WIZARD_TOWER.toString() );
-		supportedLocations.add( Locations.PORT_SARIM.toString() );
-		supportedLocations.add( Locations.RIMMINGTON.toString() );
-		supportedLocations.add( Locations.ALKHARID.toString() );
-		supportedLocations.add( Locations.ALKHARID_BANK.toString() );
-		supportedLocations.add( Locations.ALKHARID_MINE.toString() );
-		supportedLocations.add( Locations.ALKHARID_PALACE.toString() );
+		supportedLocations.add( Locations.BARBARIAN_VILLAGE.getName() );
+		supportedLocations.add( Locations.EDGEVILLE.getName() );
+		supportedLocations.add( Locations.FALADOR.getName() );
+		supportedLocations.add( Locations.FALADOR_SQUARE.getName() );
+		supportedLocations.add( Locations.FALADOR_BANK_EAST.getName() );
+		supportedLocations.add( Locations.FALADOR_BANK_WEST.getName() );
+		supportedLocations.add( Locations.FALADOR_CASTLE.getName() );
+		supportedLocations.add( Locations.GRAND_EXCHANGE.getName() );
+		supportedLocations.add( Locations.VARROK.getName() );
+		supportedLocations.add( Locations.VARROK_SQUARE.getName() );
+		supportedLocations.add( Locations.VARROK_BANK_EAST.getName() );
+		supportedLocations.add( Locations.VARROK_BANK_WEST.getName() );
+		supportedLocations.add( Locations.VARROK_MINE_EAST.getName() );
+		supportedLocations.add( Locations.VARROK_MINE_WEST.getName() );
+		supportedLocations.add( Locations.VARROK_WILDERNESS.getName() );
+		supportedLocations.add( Locations.VARROK_SEWER.getName() );
+		supportedLocations.add( Locations.LUMBRIDGE.getName() );
+		supportedLocations.add( Locations.LUMBRIDGE_BANK.getName() );
+		supportedLocations.add( Locations.DRAYNOR_MANOR_START.getName() );
+		supportedLocations.add( Locations.DRAYNOR.getName() );
+		supportedLocations.add( Locations.DRAYNOR_BANK.getName() );
+		supportedLocations.add( Locations.WIZARD_TOWER.getName() );
+		supportedLocations.add( Locations.PORT_SARIM.getName() );
+		supportedLocations.add( Locations.RIMMINGTON.getName() );
+		supportedLocations.add( Locations.ALKHARID.getName() );
+		supportedLocations.add( Locations.ALKHARID_BANK.getName() );
+		supportedLocations.add( Locations.ALKHARID_MINE.getName() );
+		supportedLocations.add( Locations.ALKHARID_PALACE.getName() );
 		Collections.sort(supportedLocations);
 
 		// Initiaize gui
@@ -86,7 +84,7 @@ public class EzWalk extends Script implements Painting,EventBlockingOverride {
 		String check = location.replace(" ", "_").toUpperCase();
 		final Locations loc = Locations.valueOf(check);
 		if ( loc != null ) {
-			println("Attempting to walk to: " + loc.toString() );
+			println("Attempting to walk to: " + loc.getName() );
 			currentTask = new BotTask() {
 
 				@Override
@@ -102,7 +100,9 @@ public class EzWalk extends Script implements Painting,EventBlockingOverride {
 				@Override
 				public boolean isTaskComplete() {
 					WebWalking.setUseRun( run );
-					Navigation.walkTo(loc, true);
+					if ( !loc.contains(Player.getPosition()) ) {
+						Navigation.walkTo(loc, true);
+					}
 					return true;
 				}
 

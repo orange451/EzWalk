@@ -9,7 +9,6 @@ import scripts.gui.RSGuiBox;
 import scripts.gui.RSGuiButton;
 import scripts.gui.RSGuiCheckbox;
 import scripts.gui.RSGuiDropDown;
-import scripts.gui.RSGuiFrame;
 import scripts.gui.RSGuiMouseListener;
 import scripts.gui.RSGuiPanel;
 import scripts.gui.RSGuiTextLabel;
@@ -73,9 +72,7 @@ public class EzWalkGui extends RSGui {
 		final RSGuiDropDown d = new RSGuiDropDown( 0, 16, boxTravel.getWidth() );
 		ArrayList<String> locs = EzWalk.supportedLocations;
 		for (int i = 0; i < locs.size(); i++) {
-			String str = locs.get(i).replace("_", " ").toLowerCase();
-			str = toTitleCase( str );
-			d.addChoice( str );
+			d.addChoice( locs.get(i) );
 		}
 		boxTravel.add(d);
 
@@ -114,14 +111,8 @@ public class EzWalkGui extends RSGui {
 		}
 	}
 
-	private String toTitleCase(String givenString) {
-	    String[] arr = givenString.split(" ");
-	    StringBuffer sb = new StringBuffer();
-
-	    for (int i = 0; i < arr.length; i++) {
-	        sb.append(Character.toUpperCase(arr[i].charAt(0)))
-	            .append(arr[i].substring(1)).append(" ");
-	    }
-	    return sb.toString().trim();
+	@Override
+	public void paint(Graphics g) {
+		//
 	}
 }
