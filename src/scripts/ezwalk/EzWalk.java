@@ -70,19 +70,29 @@ public class EzWalk extends Script implements Painting,EventBlockingOverride {
 		while(true) {
 			sleep( 50L );
 
+			// If we have a task
 			if ( currentTask != null ) {
+
+				// If it is complete
 				if ( currentTask.isTaskComplete() ) {
+
+					// Reset everything.
 					currentTask = currentTask.getNextTask();
 					println( "Walking task finished!" );
 					gui.setNotification( true );
 					gui.reset();
 				}
 			} else {
+
+				// Handle antiban stuff
 				AntiBan.timedActions();
 			}
 		}
 	}
 
+	/**
+	 * Cancels the current task.
+	 */
 	public void cancel() {
 		if ( currentTask == null )
 			return;
@@ -91,12 +101,20 @@ public class EzWalk extends Script implements Painting,EventBlockingOverride {
 		EzWalk.plugin.println("Cancelling walking task...");
 	}
 
+	/**
+	 * Walks the player to the specified location.
+	 * @param location
+	 * @param run
+	 */
 	public void walkTo( String location, final boolean run ) {
 		if ( currentTask != null )
 			return;
 
+		// Find location from ENUM file
 		String check = location.replace(" ", "_").toUpperCase();
 		final Locations loc = Locations.valueOf(check);
+
+		// If it exists walk to it!
 		if ( loc != null ) {
 			println("Attempting to walk to: " + loc.getName() );
 
