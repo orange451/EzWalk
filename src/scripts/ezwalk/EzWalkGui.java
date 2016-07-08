@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import org.tribot.api2007.Player;
+
 import scripts.gui.RSGui;
 import scripts.gui.RSGuiBox;
 import scripts.gui.RSGuiButton;
@@ -12,14 +14,18 @@ import scripts.gui.RSGuiDropDown;
 import scripts.gui.RSGuiMouseListener;
 import scripts.gui.RSGuiPanel;
 import scripts.gui.RSGuiTextLabel;
+import scripts.gui.font.ChatColor;
 import scripts.util.BotTask;
 import scripts.util.BotTaskWalk;
+import scripts.util.names.Locations;
 
 public class EzWalkGui extends RSGui {
 	private RSGuiBox boxTravel;
 	private RSGuiBox boxCancel;
-
 	private RSGuiPanel panel;
+
+	private RSGuiTextLabel lastLoc;
+	private RSGuiTextLabel toLoc;
 
 	public EzWalkGui(String string) {
 		super( string );
@@ -41,6 +47,21 @@ public class EzWalkGui extends RSGui {
 		this.boxCancel.setPadding( 8 );
 		this.panel.add( boxCancel );
 		this.panel.remove( boxCancel );
+
+
+		// Setup destination
+		this.boxCancel.add( new RSGuiTextLabel( 0, 0, "Destination:" ).setShadow(true).setBold(true).setColor(ChatColor.GOLD.toColor()) );
+		this.toLoc = new RSGuiTextLabel( 0, 16, "N/A" );
+		this.toLoc.setShadow(true);
+		this.boxCancel.add( toLoc );
+
+
+		// Setup current location
+		this.boxCancel.add( new RSGuiTextLabel( 0, 64, "Current Loation:" ).setShadow(true).setBold(true).setColor(ChatColor.GOLD.toColor()) );
+		this.lastLoc = new RSGuiTextLabel( 0, 80, "N/A" );
+		this.lastLoc.setShadow(true);
+		this.boxCancel.add( lastLoc );
+
 
 		// Start button
 		RSGuiButton b = new RSGuiButton( "Cancel" );
@@ -92,8 +113,8 @@ public class EzWalkGui extends RSGui {
 			public boolean onMousePress(int x, int y) {
 				panel.remove(boxTravel);
 				panel.add(boxCancel);
-				close();
 
+				toLoc.setText( d.getCurrentChoice() );
 				EzWalk.plugin.walkTo( d.getCurrentChoice(), check.isChecked() );
 				return true;
 			}
@@ -103,16 +124,22 @@ public class EzWalkGui extends RSGui {
 	public void reset() {
 		panel.remove(boxCancel);
 		panel.add(boxTravel);
-
-		BotTask t = EzWalk.plugin.getCurrentTask();
-		if ( t != null ) {
-			EzWalk.plugin.println("Cancelling walking task...");
-			((BotTaskWalk)t).setForceCompleted(true);
-		}
+		EzWalk.plugin.cancel();
 	}
 
 	@Override
 	public void paint(Graphics g) {
-		//
+		Locations loc = Locations.closestLocation( Player.getPosition() );
+		Locations inside = Locations.get( Player.getPosition() );
+
+		this.lastLoc.setText( "Countryside" );
+		if ( inside != null ) {
+			this.lastLoc.setText( inside.getName() );
+		} else {
+			int dist = Player.getPosition().distanceTo( loc.getCenter() );
+			if ( dist < 24 ) {
+				this.lastLoc.setText( loc.getName() );
+			}
+		}
 	}
 }

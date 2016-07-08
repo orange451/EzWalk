@@ -5,6 +5,8 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.tribot.api.General;
+import org.tribot.api.types.generic.Condition;
 import org.tribot.api2007.Player;
 import org.tribot.api2007.WebWalking;
 import org.tribot.script.Script;
@@ -14,10 +16,11 @@ import org.tribot.script.interfaces.Painting;
 
 import scripts.util.AntiBan;
 import scripts.util.BotTask;
+import scripts.util.BotTaskWalk;
 import scripts.util.names.Locations;
 import scripts.util.player.Navigation;
 
-@ScriptManifest(authors = { "orange451" }, category = "Navigation", name = "EzWalk", version = 1.00, description = "Walk to almost any F2P location in Runescape!", gameMode = 1)
+@ScriptManifest(authors = { "orange451" }, category = "Tools", name = "EzWalk", version = 1.00, description = "Walk to almost any F2P location in Runescape!", gameMode = 1)
 public class EzWalk extends Script implements Painting,EventBlockingOverride {
 	public static ArrayList<String> supportedLocations = new ArrayList<String>();
 	public static EzWalk plugin;
@@ -80,11 +83,23 @@ public class EzWalk extends Script implements Painting,EventBlockingOverride {
 		}
 	}
 
+	public void cancel() {
+		if ( currentTask == null )
+			return;
+
+		currentTask.forceComplete();
+		EzWalk.plugin.println("Cancelling walking task...");
+	}
+
 	public void walkTo( String location, final boolean run ) {
+		if ( currentTask != null )
+			return;
+
 		String check = location.replace(" ", "_").toUpperCase();
 		final Locations loc = Locations.valueOf(check);
 		if ( loc != null ) {
 			println("Attempting to walk to: " + loc.getName() );
+
 			currentTask = new BotTask() {
 
 				@Override
@@ -99,9 +114,26 @@ public class EzWalk extends Script implements Painting,EventBlockingOverride {
 
 				@Override
 				public boolean isTaskComplete() {
+					if ( this.wasForceCompleted() )
+						return true;
+
 					WebWalking.setUseRun( run );
+
+					// If we're not inside the location
 					if ( !loc.contains(Player.getPosition()) ) {
-						Navigation.walkTo(loc, true);
+
+						// Nagivate to the location
+						Navigation.walkTo(loc, new Condition() {
+							@Override
+							public boolean active() {
+
+								// Do antiban stuff, and AFK player randomly.
+								Navigation.doWalkingTasks();
+
+								// Stop when inside or if cancelled.
+								return loc.contains(Player.getRSPlayer()) || wasForceCompleted();
+							}
+						});
 					}
 					return true;
 				}
