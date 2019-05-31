@@ -1,159 +1,108 @@
 package scripts.ezwalk;
+
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import org.tribot.api.General;
-import org.tribot.api.types.generic.Condition;
-import org.tribot.api2007.Player;
-import org.tribot.api2007.WebWalking;
 import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.EventBlockingOverride;
+import org.tribot.script.interfaces.EventBlockingOverride.OVERRIDE_RETURN;
 import org.tribot.script.interfaces.Painting;
-
-import scripts.util.AntiBan;
-import scripts.util.BotTask;
-import scripts.util.BotTaskWalk;
+import scripts.gui.RSGui;
+import scripts.util.misc.AntiBan;
+import scripts.util.misc.WorldSwitcher;
 import scripts.util.names.Locations;
-import scripts.util.player.Navigation;
+import scripts.util.task.BotTask;
+import scripts.util.task.BotTaskWalk;
 
-@ScriptManifest(authors = { "orange451" }, category = "Tools", name = "EzWalk", version = 1.00, description = "Walk to almost any F2P location in Runescape!", gameMode = 1)
-public class EzWalk extends Script implements Painting,EventBlockingOverride {
-	public static ArrayList<String> supportedLocations = new ArrayList<String>();
+@ScriptManifest(authors={"orange451"}, category="Tools", name="EzWalk", version=1.0D, description="Walk to almost any F2P location in Runescape!", gameMode=1)
+public class EzWalk extends Script implements Painting, EventBlockingOverride {
+	public static ArrayList<String> supportedLocations = new ArrayList();
+
 	public static EzWalk plugin;
-
 	public EzWalkGui gui;
 	private BotTask currentTask;
 
-	@Override
 	public void run() {
 		plugin = this;
 
-		// Update supported locations
-		supportedLocations.add( Locations.BARBARIAN_VILLAGE.getName() );
-		supportedLocations.add( Locations.EDGEVILLE.getName() );
-		supportedLocations.add( Locations.FALADOR.getName() );
-		supportedLocations.add( Locations.FALADOR_SQUARE.getName() );
-		supportedLocations.add( Locations.FALADOR_BANK_EAST.getName() );
-		supportedLocations.add( Locations.FALADOR_BANK_WEST.getName() );
-		supportedLocations.add( Locations.FALADOR_CASTLE.getName() );
-		supportedLocations.add( Locations.GRAND_EXCHANGE.getName() );
-		supportedLocations.add( Locations.VARROK.getName() );
-		supportedLocations.add( Locations.VARROK_SQUARE.getName() );
-		supportedLocations.add( Locations.VARROK_BANK_EAST.getName() );
-		supportedLocations.add( Locations.VARROK_BANK_WEST.getName() );
-		supportedLocations.add( Locations.VARROK_MINE_EAST.getName() );
-		supportedLocations.add( Locations.VARROK_MINE_WEST.getName() );
-		supportedLocations.add( Locations.VARROK_WILDERNESS.getName() );
-		supportedLocations.add( Locations.VARROK_SEWER.getName() );
-		supportedLocations.add( Locations.LUMBRIDGE.getName() );
-		supportedLocations.add( Locations.LUMBRIDGE_BANK.getName() );
-		supportedLocations.add( Locations.DRAYNOR_MANOR_START.getName() );
-		supportedLocations.add( Locations.DRAYNOR.getName() );
-		supportedLocations.add( Locations.DRAYNOR_BANK.getName() );
-		supportedLocations.add( Locations.WIZARD_TOWER.getName() );
-		supportedLocations.add( Locations.PORT_SARIM.getName() );
-		supportedLocations.add( Locations.RIMMINGTON.getName() );
-		supportedLocations.add( Locations.ALKHARID.getName() );
-		supportedLocations.add( Locations.ALKHARID_BANK.getName() );
-		supportedLocations.add( Locations.ALKHARID_MINE.getName() );
-		supportedLocations.add( Locations.ALKHARID_PALACE.getName() );
+		supportedLocations.add(Locations.BARBARIAN_VILLAGE.getName());
+		supportedLocations.add(Locations.EDGEVILLE.getName());
+		supportedLocations.add(Locations.FALADOR.getName());
+		supportedLocations.add(Locations.FALADOR_SQUARE.getName());
+		supportedLocations.add(Locations.FALADOR_BANK_EAST.getName());
+		supportedLocations.add(Locations.FALADOR_BANK_WEST.getName());
+		supportedLocations.add(Locations.FALADOR_CASTLE.getName());
+		supportedLocations.add(Locations.GRAND_EXCHANGE.getName());
+		supportedLocations.add(Locations.VARROK.getName());
+		supportedLocations.add(Locations.VARROK_SQUARE.getName());
+		supportedLocations.add(Locations.VARROK_BANK_EAST.getName());
+		supportedLocations.add(Locations.VARROK_BANK_WEST.getName());
+		supportedLocations.add(Locations.VARROK_MINE_EAST.getName());
+		supportedLocations.add(Locations.VARROK_MINE_WEST.getName());
+		supportedLocations.add(Locations.VARROK_WILDERNESS.getName());
+		supportedLocations.add(Locations.VARROK_SEWER.getName());
+		supportedLocations.add(Locations.LUMBRIDGE.getName());
+		supportedLocations.add(Locations.LUMBRIDGE_BANK.getName());
+		supportedLocations.add(Locations.DRAYNOR_MANOR_START.getName());
+		supportedLocations.add(Locations.DRAYNOR.getName());
+		supportedLocations.add(Locations.DRAYNOR_BANK.getName());
+		supportedLocations.add(Locations.WIZARDS_TOWER.getName());
+		supportedLocations.add(Locations.PORT_SARIM.getName());
+		supportedLocations.add(Locations.RIMMINGTON.getName());
+		supportedLocations.add(Locations.ALKHARID.getName());
+		supportedLocations.add(Locations.ALKHARID_BANK.getName());
+		supportedLocations.add(Locations.ALKHARID_MINE.getName());
+		supportedLocations.add(Locations.ALKHARID_PALACE.getName());
 		Collections.sort(supportedLocations);
 
-		// Initiaize gui
-		gui = new EzWalkGui("scripts/ezwalk/icon.png");
+		RSGui.initialize();
+		this.gui = new EzWalkGui("http://firstrecon.net/public/tribot/iconRun.png");
+		RSGui.addTab(this.gui);
 
-		// Run script
 		while(true) {
-			sleep( 50L );
+			sleep(50L);
 
-			// If we have a task
-			if ( currentTask != null ) {
+			if (this.currentTask != null) {
 
-				// If it is complete
-				if ( currentTask.isTaskComplete() ) {
-
-					// Reset everything.
-					currentTask = currentTask.getNextTask();
-					println( "Walking task finished!" );
-					gui.setNotification( true );
-					gui.reset();
+				if (this.currentTask.isTaskComplete()) {
+					this.currentTask = this.currentTask.getNextTask();
+					println("Walking task finished!");
+					this.gui.setNotification(true);
+					this.gui.reset();
 				}
-			} else {
 
-				// Handle antiban stuff
+			} else {
 				AntiBan.timedActions();
 			}
 		}
 	}
-
-	/**
-	 * Cancels the current task.
-	 */
+	
 	public void cancel() {
-		if ( currentTask == null )
+		if (this.currentTask == null) {
 			return;
-
-		currentTask.forceComplete();
-		EzWalk.plugin.println("Cancelling walking task...");
+		}
+		this.currentTask.forceComplete();
+		plugin.println("Cancelling walking task...");
 	}
 
-	/**
-	 * Walks the player to the specified location.
-	 * @param location
-	 * @param run
-	 */
-	public void walkTo( String location, final boolean run ) {
-		if ( currentTask != null )
+	public void walkTo(String location, boolean run) {
+		if (this.currentTask != null) {
 			return;
+		}
 
-		// Find location from ENUM file
 		String check = location.replace(" ", "_").toUpperCase();
-		final Locations loc = Locations.valueOf(check);
+		Locations loc = Locations.valueOf(check);
 
-		// If it exists walk to it!
-		if ( loc != null ) {
-			println("Attempting to walk to: " + loc.getName() );
+		if (loc != null) {
+			println("Attempting to walk to: " + loc.getName());
 
-			currentTask = new BotTask() {
-
-				@Override
-				public String getTaskName() {
-					return null;
-				}
-
+			this.currentTask = new BotTaskWalk(loc.getRandomizedCenter(5.0F), run) {
 				@Override
 				public BotTask getNextTask() {
 					return null;
-				}
-
-				@Override
-				public boolean isTaskComplete() {
-					if ( this.wasForceCompleted() )
-						return true;
-
-					WebWalking.setUseRun( run );
-
-					// If we're not inside the location
-					if ( !loc.contains(Player.getPosition()) ) {
-
-						// Nagivate to the location
-						Navigation.walkTo(loc, new Condition() {
-							@Override
-							public boolean active() {
-
-								// Do antiban stuff, and AFK player randomly.
-								Navigation.doWalkingTasks();
-
-								// Stop when inside or if cancelled.
-								return loc.contains(Player.getRSPlayer()) || wasForceCompleted();
-							}
-						});
-					}
-					return true;
 				}
 
 				@Override
@@ -165,21 +114,18 @@ public class EzWalk extends Script implements Painting,EventBlockingOverride {
 	}
 
 	public void onPaint(Graphics g) {
-		gui.onPaint(g);
+		RSGui.getInstance().onPaint(g);
 	}
 
-	@Override
-	public OVERRIDE_RETURN overrideKeyEvent(KeyEvent arg0) {
-		return gui.keyEvent(arg0);
+	public EventBlockingOverride.OVERRIDE_RETURN overrideKeyEvent(KeyEvent arg0) {
+		return RSGui.getInstance().keyEvent(arg0);
 	}
 
-	@Override
-	public OVERRIDE_RETURN overrideMouseEvent(MouseEvent arg0) {
-		return gui.mouseEvent(arg0);
+	public EventBlockingOverride.OVERRIDE_RETURN overrideMouseEvent(MouseEvent arg0) {
+		return RSGui.getInstance().mouseEvent(arg0);
 	}
 
 	public BotTask getCurrentTask() {
 		return this.currentTask;
 	}
-
 }
